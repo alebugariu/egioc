@@ -16,7 +16,7 @@ putXPMpixel(XPM *imagine, unsigned int x, unsigned int y, unsigned int colorinde
 }
 
 void
-setXPMColor(XPM *imagine, unsigned int index, Color pixcolor, char *charpattern)
+setXPMColor(XPM *imagine, unsigned int index, Color pixcolor)
 {
 }
 
