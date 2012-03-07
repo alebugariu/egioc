@@ -43,9 +43,10 @@ freeXPM(XPM **img);
 extern void
 putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned int colorindex);
 
-/* Assigns a color to a color table entry (colta) in RGB format */
-extern void
-setXPMColor(XPM *img, unsigned int index, Color pixcolor);
+/* Assigns a color to a color table entry (colta) in RGB format 
+ * Returns 1 if succesfull and 0 if not */
+extern int
+setXPMColor(XPM *img, unsigned int index, XPMColor pixdata);
 
 /* Saves the XPM image to a disk file located at 'filepath'
  * Returns 1 if succesfull and 0 if not
