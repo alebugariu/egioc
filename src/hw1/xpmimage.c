@@ -10,11 +10,11 @@ newXPM(unsigned int width, unsigned int height, unsigned short cpp, unsigned int
 	toRet->chrperpixel = cpp;
 	toRet->ncolors = ncolors;
 	toRet->colta = (XPMColor *)malloc(ncolors * sizeof(XPMColor));
-	toRet->data = (unsigned short **)malloc(ncolors * sizeof(unsigned short *));
+	toRet->data = (unsigned short **)malloc(height * sizeof(unsigned short *));
 	
 	int cnt;
 	for(cnt = 0; cnt < height; ++cnt){
-		toRet->data[cnt] = (unsigned short *)malloc(width * cpp * sizeof(unsigned char));
+		toRet->data[cnt] = (unsigned short *)malloc(width * sizeof(unsigned short));
 	}
 	
 	return toRet;
@@ -42,25 +42,25 @@ setXPMColor(XPM *img, unsigned int index, Color pixcolor){
 
 int
 saveXPMtofile(XPM *img, char *filepath){
-	FILE *f = fopen(filepath, "w");
+	FILE *fXMP = fopen(filepath, "w");
 	int fctStatus = 1;
 	
-	if(f == NULL)	fctStatus = 0;
+	if(fXMP == NULL)	fctStatus = 0;
 	else{
-		fprintf(f, "static char *egc[] = {\n");
-		fprintf(f, " %d %d %d %d,\n", img->width, img->height, img->ncolors, img->chrperpixel);
+		fprintf(fXMP, "static char *egc[] = {\n");
+		fprintf(fXMP, " %d %d %d %d,\n", img->width, img->height, img->ncolors, img->chrperpixel);
 		
 		int id = 0;
 		for(id = 0; id < img->ncolors; ++id){
-			fprintf(f, "%s %s #%X%X%X,\n", img->colta[id].chars,
-										   img->colta[id].key,
-										   img->colta[id].clr.red,
-										   img->colta[id].clr.green,
-										   img->colta[id].clr.blue);
+			fprintf(fXMP, "%s %s #%X%X%X,\n", img->colta[id].chars,
+											img->colta[id].key,
+											img->colta[id].clr.red,
+											img->colta[id].clr.green,
+											img->colta[id].clr.blue);
 		}
 		
-		fprintf(f, "};\n");
-		fclose(f);
+		fprintf(fXMP, "};\n");
+		fclose(fXMP);
 	}
 	
 	return fctStatus;
