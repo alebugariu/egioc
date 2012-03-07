@@ -25,7 +25,7 @@ typedef struct{
 	unsigned short chrperpixel;
 	unsigned int ncolors; 
 	XPMColor *colta;
-	unsigned short *data[];
+	unsigned short **data;
 } XPM;
 
 
@@ -37,18 +37,18 @@ newXPM(unsigned int width, unsigned int height, unsigned short cpp, unsigned int
 
 /* Frees up the memory used by a XPM heap alocated structure */
 extern void
-freeXPM(XPM *imagine);
+freeXPM(XPM **img);
 
 /* Inserts a pixel value specified by it's table index at (x, y) with x mod chrperpixel = 0 */
 extern void
-putXPMpixel(XPM *imagine, unsigned int x, unsigned int y, unsigned int colorindex);
+putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned int colorindex);
 
 /* Assigns a color to a color table entry (colta) in RGB format */
 extern void
-setXPMColor(XPM *imagine, unsigned int index, Color pixcolor);
+setXPMColor(XPM *img, unsigned int index, Color pixcolor);
 
 /* Saves the XPM image to a disk file located at 'filepath' */
 extern void
-saveXPMtofile(XPM *imagine, char *filepath);
+saveXPMtofile(XPM *img, char *filepath);
 
 #endif
