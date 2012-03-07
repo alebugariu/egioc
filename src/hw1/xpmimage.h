@@ -47,8 +47,10 @@ putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned int colorindex);
 extern void
 setXPMColor(XPM *img, unsigned int index, Color pixcolor);
 
-/* Saves the XPM image to a disk file located at 'filepath' */
-extern void
+/* Saves the XPM image to a disk file located at 'filepath'
+ * Returns 1 if succesfull and 0 if not
+ */
+extern int
 saveXPMtofile(XPM *img, char *filepath);
 
 #endif

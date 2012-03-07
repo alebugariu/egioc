@@ -21,8 +21,7 @@ newXPM(unsigned int width, unsigned int height, unsigned short cpp, unsigned int
 }
 
 void
-freeXPM(XPM **img)
-{
+freeXPM(XPM **img){
 	int cnt;
 	for(cnt = 0; cnt < (*img)->height; ++cnt){
 		free((*img)->data[cnt]);
@@ -33,16 +32,36 @@ freeXPM(XPM **img)
 }
 
 void
-putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned int colorindex)
-{
+putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned int colorindex){
+	
 }
 
 void
-setXPMColor(XPM *img, unsigned int index, Color pixcolor)
-{
+setXPMColor(XPM *img, unsigned int index, Color pixcolor){
 }
 
-void
-saveXPMtofile(XPM *img, char *filepath)
-{
+int
+saveXPMtofile(XPM *img, char *filepath){
+	FILE *f = fopen(filepath, "w");
+	int fctStatus = 1;
+	
+	if(f == NULL)	fctStatus = 0;
+	else{
+		fprintf(f, "static char *egc[] = {\n");
+		fprintf(f, " %d %d %d %d,\n", img->width, img->height, img->ncolors, img->chrperpixel);
+		
+		int id = 0;
+		for(id = 0; id < img->ncolors; ++id){
+			fprintf(f, "%s %s #%X%X%X,\n", img->colta[id].chars,
+										   img->colta[id].key,
+										   img->colta[id].clr.red,
+										   img->colta[id].clr.green,
+										   img->colta[id].clr.blue);
+		}
+		
+		fprintf(f, "};\n");
+		fclose(f);
+	}
+	
+	return fctStatus;
 }
