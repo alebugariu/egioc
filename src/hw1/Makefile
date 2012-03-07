@@ -9,4 +9,5 @@ xpmimage.o: xpmimage.c xpmimage.h
 
 clean:
 	rm -f *.o
+	rm -f *.xpm
 	rm -f main
