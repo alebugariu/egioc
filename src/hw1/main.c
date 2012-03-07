@@ -3,7 +3,7 @@
 #include "xpmimage.h"
 
 void
-loadColorTable(XPM *img){
+assignColorTable(XPM *img){
 	XPMColor clrData;
 	unsigned short clrIndex = 0;
 	
@@ -24,11 +24,27 @@ loadColorTable(XPM *img){
 	}
 }
 
+void
+makeTransientImg(XPM *img){
+	int ypix = 0;
+	int xpix = 0;
+	int colIndex = 0;
+	
+	for(ypix = 0; ypix < img->height; ++ypix){
+		colIndex = 0;
+		for(xpix = 0; xpix < img->width; ++xpix){
+			putXPMpixel(img, xpix, ypix, colIndex);
+			colIndex ++;
+		}
+	}
+}
+
 int
 main(int argc, char *argv[]){
 	XPM *img = newXPM(50, 50, 2, 50);
 	
-	loadColorTable(img);
+	assignColorTable(img);
+	makeTransientImg(img);
 	saveXPMtofile(img, "tema1.xpm");
 	
 	freeXPM(&img);

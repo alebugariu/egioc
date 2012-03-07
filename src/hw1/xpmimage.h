@@ -39,12 +39,15 @@ newXPM(unsigned int width, unsigned int height, unsigned short cpp, unsigned int
 extern void
 freeXPM(XPM **img);
 
-/* Inserts a pixel value specified by it's table index at (x, y) with x mod chrperpixel = 0 */
-extern void
-putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned int colorindex);
+/* Inserts a pixel value specified by it's table index at (x, y) with x mod chrperpixel = 0 
+ * Returns 1 if succesfull and 0 if not
+ */
+extern int
+putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned short colorindex);
 
 /* Assigns a color to a color table entry (colta) in RGB format 
- * Returns 1 if succesfull and 0 if not */
+ * Returns 1 if succesfull and 0 if not
+ */
 extern int
 setXPMColor(XPM *img, unsigned int index, XPMColor pixdata);
 
