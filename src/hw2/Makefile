@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -g
 
 all: xpmimage.o
 	$(CC) $(CFLAGS) xpmimage.o main.c -o main
