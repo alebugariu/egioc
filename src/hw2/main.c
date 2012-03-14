@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "xpmimage.h"
 
 #define SYMMETRIC 1
@@ -287,8 +288,11 @@ void
 assignColorTable(XPM *img, const unsigned char vColors[][3], int clrCnt){
   XPMColor clrData;
   int clrIndex = 0;
+  char charsFormat[10];
 
-  img->ncolors = clrCnt;
+  if(clrCnt > img->ncolors ||
+     clrCnt > pow(2, img->chrperpixel * 8) - 1) return;
+
   for(clrIndex = 1; clrIndex <= clrCnt; clrIndex ++){
     /* load RGB values */
     clrData.clr.blue = vColors[clrIndex - 1][0];
@@ -296,10 +300,22 @@ assignColorTable(XPM *img, const unsigned char vColors[][3], int clrCnt){
     clrData.clr.red = vColors[clrIndex - 1][2];
 
     /* load dynamic data */
-    clrData.key = (char *)malloc(sizeof(char) + 1);
+    clrData.key = (char *)malloc(2 * sizeof(char));
     strcpy(clrData.key, "c");
-    clrData.chars = (char *)malloc(img->chrperpixel * sizeof(char));
-    sprintf(clrData.chars, "%02X", clrIndex - 1);
+    clrData.chars = (char *)malloc((1 + img->chrperpixel) * sizeof(char));
+    
+    /* load formated pixel chars */
+    switch(img->chrperpixel){
+    case 1:
+      if(clrCnt <= 0x0F) sprintf(clrData.chars, "%1X", clrIndex);
+      else sprintf(clrData.chars, "%c", clrIndex);
+      //printf("%s\n", clrData.chars);getchar();
+      break;
+    default:
+      sprintf(charsFormat, "%%0%dX", img->chrperpixel);
+      sprintf(clrData.chars, charsFormat, clrIndex);
+      break;
+    }
 		
     setXPMColor(img, clrIndex - 1, clrData);
   }
@@ -308,10 +324,10 @@ assignColorTable(XPM *img, const unsigned char vColors[][3], int clrCnt){
 int
 main(int argc, char *argv[]){
   const unsigned char clrTable[][3] = {{255, 255, 255}, {0, 0, 0}};
-  XPM *img = newXPM(200, 200, 2, sizeof(clrTable)/(sizeof(unsigned char) * 3));
+  XPM *img = newXPM(300, 300, 1, sizeof(clrTable)/(sizeof(unsigned char) * 3));
 
   assignColorTable(img, clrTable, sizeof(clrTable)/(sizeof(unsigned char) * 3));
-  renderPSFile(img, "test.ps", &printGElement);
+  renderPSFile(img, "example.ps", &printGElement);
   saveXPMtofile(img, "tema2.xpm");
 
   freeXPM(&img);

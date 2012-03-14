@@ -86,10 +86,10 @@ saveXPMtofile(XPM *img, char *filepath){
 		int id = 0;
 		for(id = 0; id < img->ncolors; ++id){
 			fprintf(fXPM, "\"%s %s #%02X%02X%02X\",\n", img->colta[id].chars,
-													img->colta[id].key,
-													img->colta[id].clr.red,
-													img->colta[id].clr.green,
-													img->colta[id].clr.blue);
+				img->colta[id].key,
+				img->colta[id].clr.red,
+				img->colta[id].clr.green,
+				img->colta[id].clr.blue);
 		}
 		
 		/* dump image pixels */

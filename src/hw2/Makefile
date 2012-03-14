@@ -1,8 +1,9 @@
 CC = gcc
 CFLAGS = -Wall -g
+LDFLAGS = -lm
 
 all: xpmimage.o
-	$(CC) $(CFLAGS) xpmimage.o main.c -o main
+	$(CC) $(CFLAGS) xpmimage.o main.c -o main $(LDFLAGS)
 
 xpmimage.o: xpmimage.c xpmimage.h
 	$(CC) -c $(CFLAGS) -o $@ $< 
