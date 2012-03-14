@@ -41,11 +41,200 @@ typedef struct{
   GElementType type;
 }GElement;
 
+static unsigned char
+getRegionCode(XPM *canvas, Point *pt)
+{
+    char code = 0;
+    
+    if(pt->y > canvas->height) code |= BIT3IS1;
+    if(pt->y < WINDOWBOTTOM) code |= BIT2IS1;
+    if(pt->x > canvas->width) code |= BIT1IS1;
+    if(pt->x < WINDOWLEFT) code |= BIT0IS1;
+    
+    return code;
+}
+
+static void
+trimLineToRegion(XPM *canvas, Point *start, Point *end, unsigned char codeStart, unsigned char codeEnd)
+{
+    int code, newX, newY;
+
+    if(codeStart == 0) code = codeEnd;
+    else code = codeStart;
+
+    if(code & BIT0IS1)
+    {
+        newY = (*start).y + ((*end).y - (*start).y) * (WINDOWLEFT - (*start).x) / ((*end).x - (*start).x);
+        newX = WINDOWLEFT;
+    }
+    else if(code & BIT1IS1)
+    {
+        newY = (*start).y + ((*end).y - (*start).y) * (canvas->width - (*start).x) / ((*end).x - (*start).x);
+        newX = canvas->width;
+    }
+    else if(code & BIT2IS1)
+    {
+        newX = (*start).x + ((*end).x - (*start).x) * (WINDOWBOTTOM - (*start).y) / ((*end).y - (*start).y);
+        newY = WINDOWBOTTOM;
+
+    }
+    else if(code & BIT3IS1)
+    {
+        newX = (*start).x + ((*end).x - (*start).x) * (canvas->height - (*start).y) / ((*end).y - (*start).y);
+        newY = canvas->height;
+
+    }
+    if (code == codeStart)
+    {
+        (*start).x = newX;
+        (*start).y = newY;
+    }
+    else
+    {
+        (*end).x = newX;
+        (*end).y = newY;
+    }
+}
+
+int 
+CSFrameLine(XPM *canvas, Point *pStart, Point *pEnd)
+{
+  unsigned char codeStart = getRegionCode(canvas, pStart);
+  unsigned char codeEnd = getRegionCode(canvas,pEnd);
+
+    if((codeStart | codeEnd) == 0) return COMPLETELYIN;
+    if((codeStart & codeEnd) != 0) return COMPLETELYOUT;
+    trimLineToRegion(canvas, pStart, pEnd, codeStart, codeEnd);
+
+    return CSFrameLine(canvas, pStart, pEnd);
+}
+
 void
-printGElement(GElement *el){
+bresenhamX (XPM *canvas, Point q, Point r, int symmetry, unsigned short clrIndex)
+{
+    int dx, dy, D, x, y;
+    dx = r.x - q.x;
+    if (symmetry == ASYMMETRIC)
+        dy = r.y - q.y;
+    else dy = q.y - r.y;
+    D = 2*dy - dx;
+    y = q.y;
+    for (x = q.x; x <= r.x; x++)
+    {
+      putXPMpixel(canvas, x, canvas->height - y, clrIndex);
+        if (D <= 0) D += 2 * dy;
+        else
+        {
+            D += 2*(dy - dx);
+            if(symmetry == ASYMMETRIC)
+                y++;
+            else y--;
+        }
+    }
+}
+
+void
+bresenhamY (XPM *canvas, Point q, Point r, int symmetry, unsigned short clrIndex)
+{
+    int dx, dy, D, x, y;
+    if(symmetry == ASYMMETRIC)
+        dx = r.x - q.x;
+    else dx = q.x - r.x;
+    dy = r.y - q.y;
+    D = 2*dx - dy;
+    x = q.x;
+    for (y = q.y; y <= r.y; y++)
+    {
+        putXPMpixel(canvas, x, canvas->height - y, clrIndex);
+        if (D <= 0) D += 2 * dx;
+        else
+        {
+            D += 2*(dx - dy);
+            if(symmetry == ASYMMETRIC)
+                x++;
+            else x--;
+        }
+    }
+}
+
+void
+drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorIndex)
+{
+    if(pEnd.x > pStart.x &&
+       pEnd.y >= pStart.y &&
+       (pEnd.x - pStart.x) >= (pEnd.y - pStart.y))
+        //octant 1
+    {
+        printf("Octant 1:");
+        bresenhamX(canvas,pStart,pEnd,ASYMMETRIC,colorIndex);
+    }
+    else if(pEnd.x >= pStart.x &&
+	    pEnd.y > pStart.y && 
+	    (pEnd.x - pStart.x) < (pEnd.y - pStart.y))
+        //octant 2
+    {
+        printf("Octant 2:");
+        bresenhamY(canvas,pStart,pEnd,ASYMMETRIC,colorIndex);
+    }
+    else if(pEnd.x < pStart.x &&
+	    pEnd.y > pStart.y && 
+	    (pStart.x - pEnd.x) < (pEnd.y - pStart.y))
+        //octant 3
+    {
+        printf("Octant 3:");
+        bresenhamY(canvas,pStart,pEnd,SYMMETRIC,colorIndex);
+    }
+    else if(pEnd.x < pStart.x &&
+	    pEnd.y >= pStart.y &&
+	    (pStart.x - pEnd.x) >= (pEnd.y - pStart.y))
+        //octant 4
+    {
+        printf("Octant 4:");
+        bresenhamX(canvas,pEnd,pStart,SYMMETRIC,colorIndex);
+    }
+    else if (pEnd.x < pStart.x &&
+	     pEnd.y < pStart.y &&
+	     (pStart.x - pEnd.x) >= (pStart.y - pEnd.y))
+        //octant 5
+    {
+        printf("Octant 5:");
+        bresenhamX(canvas,pEnd,pStart,ASYMMETRIC,colorIndex);
+    }
+    else if (pEnd.x <= pStart.x &&
+	     pEnd.y < pStart.y &&
+	     (pStart.x - pEnd.x) < (pStart.y - pEnd.y))
+        //octant 6
+    {
+        printf("Octant 6:");
+        bresenhamY(canvas,pEnd,pStart,ASYMMETRIC,colorIndex);
+    }
+    else if(pEnd.x > pStart.x &&
+	    pEnd.y < pStart.y &&
+	    (pEnd.x - pStart.x) <= (pStart.y - pEnd.y))
+        //octant 7
+    {
+        printf("Octant 7:");
+        bresenhamY(canvas,pEnd,pStart,SYMMETRIC,colorIndex);
+    }
+    else //octant 8
+    {
+        printf("Octant 8:");
+        bresenhamX(canvas,pStart,pEnd,SYMMETRIC,colorIndex);
+    }
+}
+
+void
+printGElement(XPM *canvas, GElement *el){
   switch(el->type){
   case LINE:
-    printf("Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", el->data.line.st.x, el->data.line.st.y, el->data.line.en.x, el->data.line.en.y);
+    printf("Original Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", el->data.line.st.x, el->data.line.st.y, el->data.line.en.x, el->data.line.en.y);
+    if(CSFrameLine(canvas, &el->data.line.st, &el->data.line.en) == 1){
+      printf("Trimed Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", el->data.line.st.x, el->data.line.st.y, el->data.line.en.x, el->data.line.en.y);
+      drawBresenhamLine(canvas, el->data.line.st, el->data.line.en, 1);
+    }
+    else{
+      printf("*** Line was totally outside the canvas.\n");
+    }
     break;
   default:
     printf("Unhandled type!\n");
@@ -65,7 +254,7 @@ parsePSLine(const char *line, GElement *dest){
 }
 
 procPSFileReturnVal
-processPSFile(const char *file, void (*lineCallback)(GElement *)){
+renderPSFile(XPM *canvas, const char *file, void (*lineCallback)(XPM *, GElement *)){
   procPSFileReturnVal returnCode = PSFILE_OK;
   char currentLine[255];
   GElement aquiredEl;
@@ -83,7 +272,7 @@ processPSFile(const char *file, void (*lineCallback)(GElement *)){
     fgets(currentLine, sizeof(currentLine), fhandle);
     while(!feof(fhandle) && strcmp(currentLine, PS_END_MARK) != 0){
       parsePSLine(currentLine, &aquiredEl);
-      if(NULL != lineCallback) (*lineCallback)(&aquiredEl);
+      if(NULL != lineCallback) (*lineCallback)(canvas, &aquiredEl);
       
       fgets(currentLine, sizeof(currentLine), fhandle);
     }
@@ -94,197 +283,37 @@ processPSFile(const char *file, void (*lineCallback)(GElement *)){
   return returnCode;
 }
 
-unsigned char
-getRegionCode(Point p)
-{
-    char code = 0;
-    
-    if(p.y > HEIGHT) code |= BIT3IS1;
-    if(p.y < WINDOWBOTTOM) code |= BIT2IS1;
-    if(p.x > WIDTH) code |= BIT1IS1;
-    if(p.x < WINDOWLEFT) code |= BIT0IS1;
-    
-    return code;
-}
-
 void
-trimLine(Point *start, Point *end, char codeStart, char codeEnd)
-{
-    int code, newX, newY;
-    if(codeStart == 0) code = codeEnd;
-    else code = codeStart;
+assignColorTable(XPM *img, const unsigned char vColors[][3], int clrCnt){
+  XPMColor clrData;
+  int clrIndex = 0;
 
-    if(code & BIT0IS1)
-    {
-        newY = (*start).y + ((*end).y - (*start).y) * (WINDOWLEFT - (*start).x) / ((*end).x - (*start).x);
-        newX = WINDOWLEFT;
-    }
-    else if(code & BIT1IS1)
-    {
-        newY = (*start).y + ((*end).y - (*start).y) * (WIDTH- (*start).x) / ((*end).x - (*start).x);
-        newX = WIDTH;
-    }
-    else if(code & BIT2IS1)
-    {
-        newX = (*start).x + ((*end).x - (*start).x) * (WINDOWBOTTOM - (*start).y) / ((*end).y - (*start).y);
-        newY = WINDOWBOTTOM;
+  img->ncolors = clrCnt;
+  for(clrIndex = 1; clrIndex <= clrCnt; clrIndex ++){
+    /* load RGB values */
+    clrData.clr.blue = vColors[clrIndex - 1][0];
+    clrData.clr.green = vColors[clrIndex - 1][1];
+    clrData.clr.red = vColors[clrIndex - 1][2];
 
-    }
-    else if(code & BIT3IS1)
-    {
-        newX = (*start).x + ((*end).x - (*start).x) * (HEIGHT - (*start).y) / ((*end).y - (*start).y);
-        newY = HEIGHT;
-
-    }
-    if (code == codeStart)
-    {
-        (*start).x = newX;
-        (*start).y = newY;
-    }
-    else
-    {
-        (*end).x = newX;
-        (*end).y = newY;
-    }
-}
-
-int 
-cohenSutherland(Point *pStart, Point *pEnd)
-{
-    unsigned char codeStart = getRegionCode(*pStart);
-    unsigned char codeEnd = getRegionCode(*pEnd);
-
-    if((codeStart | codeEnd) == 0) return COMPLETELYIN;
-    if((codeStart & codeEnd) != 0) return COMPLETELYOUT;
-    trimLine(pStart, pEnd, codeStart, codeEnd);
-
-    return cohenSutherland(pStart, pEnd);
-}
-
-void
-writePixel(int x, int y)
-{
-    //va apela putPixel din tema1 cu argumetele x si HEIGHT - y
-}
-
-void
-bresenhamX (Point q, Point r, int symmetry)
-{
-    int dx, dy, D, x, y;
-    dx = r.x - q.x;
-    if (symmetry == ASYMMETRIC)
-        dy = r.y - q.y;
-    else dy = q.y - r.y;
-    D = 2*dy - dx;
-    y = q.y;
-    for (x = q.x; x <= r.x; x++)
-    {
-        writePixel (x, y);
-        if (D <= 0) D += 2 * dy;
-        else
-        {
-            D += 2*(dy - dx);
-            if(symmetry == ASYMMETRIC)
-                y++;
-            else y--;
-        }
-    }
-    printf("\n");
-}
-
-void
-bresenhamY (Point q, Point r, int symmetry)
-{
-    int dx, dy, D, x, y;
-    if(symmetry == ASYMMETRIC)
-        dx = r.x - q.x;
-    else dx = q.x - r.x;
-    dy = r.y - q.y;
-    D = 2*dx - dy;
-    x = q.x;
-    for (y = q.y; y <= r.y; y++)
-    {
-        writePixel (x, y);
-        if (D <= 0) D += 2 * dx;
-        else
-        {
-            D += 2*(dx - dy);
-            if(symmetry == ASYMMETRIC)
-                x++;
-            else x--;
-        }
-    }
-    printf("\n");
-}
-
-void
-drawBresenhamLine(Point pStart, Point pEnd)
-{
-    if(pEnd.x > pStart.x &&
-       pEnd.y >= pStart.y &&
-       (pEnd.x - pStart.x) >= (pEnd.y - pStart.y))
-        //octant 1
-    {
-        printf("Octant 1:");
-        bresenhamX(pStart,pEnd,ASYMMETRIC);
-    }
-    else if(pEnd.x >= pStart.x &&
-	    pEnd.y > pStart.y && 
-	    (pEnd.x - pStart.x) < (pEnd.y - pStart.y))
-        //octant 2
-    {
-        printf("Octant 2:");
-        bresenhamY(pStart,pEnd,ASYMMETRIC);
-    }
-    else if(pEnd.x < pStart.x &&
-	    pEnd.y > pStart.y && 
-	    (pStart.x - pEnd.x) < (pEnd.y - pStart.y))
-        //octant 3
-    {
-        printf("Octant 3:");
-        bresenhamY(pStart,pEnd,SYMMETRIC);
-    }
-    else if(pEnd.x < pStart.x &&
-	    pEnd.y >= pStart.y &&
-	    (pStart.x - pEnd.x) >= (pEnd.y - pStart.y))
-        //octant 4
-    {
-        printf("Octant 4:");
-        bresenhamX(pEnd,pStart,SYMMETRIC);
-    }
-    else if (pEnd.x < pStart.x &&
-	     pEnd.y < pStart.y &&
-	     (pStart.x - pEnd.x) >= (pStart.y - pEnd.y))
-        //octant 5
-    {
-        printf("Octant 5:");
-        bresenhamX(pEnd,pStart,ASYMMETRIC);
-    }
-    else if (pEnd.x <= pStart.x &&
-	     pEnd.y < pStart.y &&
-	     (pStart.x - pEnd.x) < (pStart.y - pEnd.y))
-        //octant 6
-    {
-        printf("Octant 6:");
-        bresenhamY(pEnd,pStart,ASYMMETRIC);
-    }
-    else if(pEnd.x > pStart.x &&
-	    pEnd.y < pStart.y &&
-	    (pEnd.x - pStart.x) <= (pStart.y - pEnd.y))
-        //octant 7
-    {
-        printf("Octant 7:");
-        bresenhamY(pEnd,pStart,SYMMETRIC);
-    }
-    else //octant 8
-    {
-        printf("Octant 8:");
-        bresenhamX(pStart,pEnd,SYMMETRIC);
-    }
+    /* load dynamic data */
+    clrData.key = (char *)malloc(sizeof(char) + 1);
+    strcpy(clrData.key, "c");
+    clrData.chars = (char *)malloc(img->chrperpixel * sizeof(char));
+    sprintf(clrData.chars, "%02X", clrIndex - 1);
+		
+    setXPMColor(img, clrIndex - 1, clrData);
+  }
 }
 
 int
 main(int argc, char *argv[]){
-  processPSFile("test.ps", &printGElement);
+  const unsigned char clrTable[][3] = {{255, 255, 255}, {0, 0, 0}};
+  XPM *img = newXPM(200, 200, 2, sizeof(clrTable)/(sizeof(unsigned char) * 3));
+
+  assignColorTable(img, clrTable, sizeof(clrTable)/(sizeof(unsigned char) * 3));
+  renderPSFile(img, "test.ps", &printGElement);
+  saveXPMtofile(img, "tema2.xpm");
+
+  freeXPM(&img);
   return 0;
 }

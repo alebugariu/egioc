@@ -20,12 +20,12 @@ typedef struct{
 
 /* XPM structure that holds a complete XPM image segment */
 typedef struct{
-	unsigned int width; 
-	unsigned int height; 
-	unsigned short chrperpixel;
-	unsigned int ncolors; 
-	XPMColor *colta;
-	unsigned short **data;
+  unsigned int width; 
+  unsigned int height; 
+  unsigned short chrperpixel;
+  unsigned int ncolors; 
+  XPMColor *colta;
+  unsigned short **data;
 } XPM;
 
 
