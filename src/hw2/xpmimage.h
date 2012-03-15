@@ -3,6 +3,29 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+/* Macro definition region */
+#define SYMMETRIC 1
+#define ASYMMETRIC 0
+
+#define BIT0IS1 1
+#define BIT1IS1 2
+#define BIT2IS1 4
+#define BIT3IS1 8
+
+#define WINDOWLEFT 0
+#define WINDOWBOTTOM 0
+
+#define COMPLETELYIN 1
+#define COMPLETELYOUT 0
+
+/* A simple point structure */
+typedef struct{
+  int x;
+  int y;
+}Point;
 
 /* Color structure that holds pixel data */
 typedef struct{
@@ -27,7 +50,6 @@ typedef struct{
   XPMColor *colta;
   unsigned short **data;
 } XPM;
-
 
 /* Initialize a XPM structure with custom
  * width, height, characters/pixel and number of colors
@@ -56,5 +78,17 @@ setXPMColor(XPM *img, unsigned int index, XPMColor pixdata);
  */
 extern int
 saveXPMtofile(XPM *img, char *filepath);
+
+/* Assigns a color matrix of nx3 values to the desired XPM structure */
+void
+assignColorTable(XPM *img, const unsigned char vColors[][3], int clrCnt);
+
+/* Draws a line onto the XPM image using Bresenham' algorithm */
+extern void
+drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorIndex);
+
+/* Trims a line so that it may fit inside the XPM image */
+extern int 
+cohenSutherlandFrameLine(XPM *canvas, Point *pStart, Point *pEnd);
 
 #endif
