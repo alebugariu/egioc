@@ -270,7 +270,6 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
        (pEnd.x - pStart.x) >= (pEnd.y - pStart.y))
         //octant 1
     {
-        printf("Octant 1:");
         bresenhamX(canvas,pStart,pEnd,ASYMMETRIC,colorIndex);
     }
     else if(pEnd.x >= pStart.x &&
@@ -278,7 +277,6 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
 	    (pEnd.x - pStart.x) < (pEnd.y - pStart.y))
         //octant 2
     {
-        printf("Octant 2:");
         bresenhamY(canvas,pStart,pEnd,ASYMMETRIC,colorIndex);
     }
     else if(pEnd.x < pStart.x &&
@@ -286,7 +284,6 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
 	    (pStart.x - pEnd.x) < (pEnd.y - pStart.y))
         //octant 3
     {
-        printf("Octant 3:");
         bresenhamY(canvas,pStart,pEnd,SYMMETRIC,colorIndex);
     }
     else if(pEnd.x < pStart.x &&
@@ -294,7 +291,6 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
 	    (pStart.x - pEnd.x) >= (pEnd.y - pStart.y))
         //octant 4
     {
-        printf("Octant 4:");
         bresenhamX(canvas,pEnd,pStart,SYMMETRIC,colorIndex);
     }
     else if (pEnd.x < pStart.x &&
@@ -302,7 +298,6 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
 	     (pStart.x - pEnd.x) >= (pStart.y - pEnd.y))
         //octant 5
     {
-        printf("Octant 5:");
         bresenhamX(canvas,pEnd,pStart,ASYMMETRIC,colorIndex);
     }
     else if (pEnd.x <= pStart.x &&
@@ -310,7 +305,6 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
 	     (pStart.x - pEnd.x) < (pStart.y - pEnd.y))
         //octant 6
     {
-        printf("Octant 6:");
         bresenhamY(canvas,pEnd,pStart,ASYMMETRIC,colorIndex);
     }
     else if(pEnd.x > pStart.x &&
@@ -318,12 +312,10 @@ drawBresenhamLine(XPM *canvas, Point pStart, Point pEnd, unsigned short colorInd
 	    (pEnd.x - pStart.x) <= (pStart.y - pEnd.y))
         //octant 7
     {
-        printf("Octant 7:");
         bresenhamY(canvas,pEnd,pStart,SYMMETRIC,colorIndex);
     }
     else //octant 8
     {
-        printf("Octant 8:");
         bresenhamX(canvas,pStart,pEnd,SYMMETRIC,colorIndex);
     }
 }
