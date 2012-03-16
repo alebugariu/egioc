@@ -174,7 +174,7 @@ trimLineToRegion(XPM *canvas, Point *start, Point *end, unsigned char codeStart,
     }
     else if(code & BIT1IS1)
     {
-        newY = (*start).y + ((*end).y - (*start).y) * (canvas->width - (*start).x) / ((*end).x - (*start).x);
+        newY = (*start).y + ((*end).y - (*start).y) * ((int)canvas->width - (*start).x) / ((*end).x - (*start).x);
         newX = canvas->width;
     }
     else if(code & BIT2IS1)
@@ -185,7 +185,7 @@ trimLineToRegion(XPM *canvas, Point *start, Point *end, unsigned char codeStart,
     }
     else if(code & BIT3IS1)
     {
-        newX = (*start).x + ((*end).x - (*start).x) * (canvas->height - (*start).y) / ((*end).y - (*start).y);
+        newX = (*start).x + ((*end).x - (*start).x) * ((int)canvas->height - (*start).y) / ((*end).y - (*start).y);
         newY = canvas->height;
 
     }
