@@ -1,10 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "xpmimage.h"
 #include "xpmps.h"
+
+struct option{
+  char *name;
+  int expectedArgCount;
+  int isOptional;
+  int visitCount;
+};
 
 void
 printUsage(void){
@@ -36,43 +43,69 @@ main(int argc, char *argv[]){
   };
   int optWidth = 1;
   int optHeight = 1;
+  int optwLeft = 0;
+  int optwRight = 0;
+  int optwBottom = 0;
+  int isClipSet = 0;
+  int optwTop = 0;
   char *psInput = NULL;
   char *xpmOut = NULL;
   XPM *img = NULL;
-  int option = 0;
 
-  while((option = getopt(argc, argv, "f:w:h:o:")) != -1){
-    switch(option){
-    case 'f':
-      psInput = optarg;
-      break;
-    case 'w':
-      optWidth = atoi(optarg);
-      break;
-    case 'h':
-      optHeight = atoi(optarg);
-      break;
-    case 'o':
-      xpmOut = optarg;
-      break;
-    case '?':
-      if(isprint(optopt))
-	fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-      else
-	fprintf (stderr,"Unknown option character `\\x%x'.\n", optopt);
-      printUsage();
-      exit(1);
-      break;
-    default:
-      /* it shouldn't reach this point */
-      exit(1);
-      break;
+  struct option options[] = {
+    {"-wt", 1, 1, 0},
+    {"-wl", 1, 1, 0},
+    {"-wr", 1, 1, 0},
+    {"-wb", 1, 1, 0},
+    {"-f",  1, 0, 0},
+    {"-w",  1, 0, 0},
+    {"-h",  1, 0, 0},
+    {"-o",  1, 0, 0},
+    {0,    0,  0, 0}
+  };
+
+  int argIndex = 1;
+  int optIndex = 0;
+  for(argIndex = 1; argIndex < argc; ++argIndex){
+    for(optIndex = 0; options[optIndex].name != NULL; ++optIndex){
+      if(strcmp(argv[argIndex], options[optIndex].name) == 0){
+	if(strcmp(argv[argIndex], "-wt") == 0){
+	  /* set clip top margin */
+	  optwTop = atoi(argv[argIndex + 1]);
+	  isClipSet = 1;
+	} else if(strcmp(argv[argIndex], "-wl") == 0){
+	  /* set clip left margin */
+	  optwLeft = atoi(argv[argIndex + 1]);
+	  isClipSet = 1;
+	} else if(strcmp(argv[argIndex], "-wr") == 0){
+	  /* set clip right margin */
+	  optwRight = atoi(argv[argIndex + 1]);
+	  isClipSet = 1;
+	} else if(strcmp(argv[argIndex], "-wb") == 0){
+	  optwBottom = atoi(argv[argIndex + 1]);
+	  isClipSet = 1;
+	} else if(strcmp(argv[argIndex], "-f") == 0){
+	  psInput = argv[argIndex + 1];
+	} else if(strcmp(argv[argIndex], "-w") == 0){
+	  optWidth = atoi(argv[argIndex + 1]);
+	} else if(strcmp(argv[argIndex], "-h") == 0){
+	  optHeight = atoi(argv[argIndex + 1]);
+	} else if(strcmp(argv[argIndex], "-o") == 0){
+	  xpmOut = argv[argIndex + 1];
+	} else {
+	  fprintf(stderr, "Option not handled yet!\n");
+	}
+	argIndex += options[optIndex].expectedArgCount;
+	break;
+      }
     }
   }
 
   img = newXPM(optWidth, optHeight, 1, sizeof(clrTable)/(sizeof(unsigned char) * 3));
-  assignXPMdisplayRegion(img, 0, optHeight, optWidth, 0);
+  /*printf("%d l: %d r: %d, b: %d t: %d", isClipSet, optwLeft, optwRight, optwBottom, optwTop);*/
+  if(0 != isClipSet) assignXPMdisplayRegion(img, optwLeft, optwTop, optwRight, optwBottom);
   assignXPMColorTable(img, clrTable, sizeof(clrTable)/(sizeof(unsigned char) * 3));
+
   renderPSFile(img, psInput, &renderGElement);
   saveXPMtofile(img, xpmOut);
   printf("Program finished ...\n");

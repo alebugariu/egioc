@@ -52,32 +52,32 @@ assignXPMdisplayRegion(XPM *img, int wLeft, int wTop, int wRight, int wBottom){
 
 int
 putXPMpixel(XPM *img, unsigned int x, unsigned int y, unsigned short colorindex){
-	int fctStatus = 1;
-	
-	if(colorindex > img->ncolors ||
-	   x > img->width ||
-	   y > img->height)
-	   fctStatus = 0;
-	else{
-		img->data[y][x] = colorindex;
-	}
-	
-	return fctStatus;
+  int fctStatus = 1;
+
+  if(colorindex > img->ncolors ||
+     x > img->width ||
+     y > img->height)
+    fctStatus = 0;
+  else{
+    img->data[y][x] = colorindex;
+  }
+
+  return fctStatus;
 }
 
 int
 setXPMColor(XPM *img, unsigned int index, XPMColor pixdata){
-	int fctStatus = 1;
-	
-	if(index > img->ncolors)	fctStatus = 0;
-	else{
-		if(img->colta[index].chars != NULL)	free(img->colta[index].chars);
-		if(img->colta[index].key != NULL)	free(img->colta[index].key);
-		
-		img->colta[index] = pixdata;
-	}
-	
-	return fctStatus;
+  int fctStatus = 1;
+  
+  if(index > img->ncolors)	fctStatus = 0;
+  else{
+    if(img->colta[index].chars != NULL)	free(img->colta[index].chars);
+    if(img->colta[index].key != NULL)	free(img->colta[index].key);
+    
+    img->colta[index] = pixdata;
+  }
+  
+  return fctStatus;
 }
 
 int
@@ -163,10 +163,10 @@ getRegionCode(XPM *canvas, Point *pt)
 {
     char code = 0;
     
-    if(pt->y > canvas->height) code |= BIT3IS1;
-    if(pt->y < WINDOWBOTTOM) code |= BIT2IS1;
-    if(pt->x > canvas->width) code |= BIT1IS1;
-    if(pt->x < WINDOWLEFT) code |= BIT0IS1;
+    if(pt->y > canvas->displayRegion.windowTop) code |= BIT3IS1;
+    if(pt->y < canvas->displayRegion.windowBottom) code |= BIT2IS1;
+    if(pt->x > canvas->displayRegion.windowRight) code |= BIT1IS1;
+    if(pt->x < canvas->displayRegion.windowLeft) code |= BIT0IS1;
     
     return code;
 }
