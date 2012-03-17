@@ -68,3 +68,45 @@ Fisierele in format PostScript sunt fisiere text, avand in general extensia .ps.
   *  **-o nume_fisier_XPM** (numele fisierului de iesire XPM)
 
 Exemplu de utilizare: **lineout -f in.ps -w 200 -h 200 -o out.xpm**
+
+## Lucrarea 3: Operaţii de decupare (*Clipping*) ##
+#### Clipping ####
+Unul dintre algoritmii cei mai des utilizati pentru clipping-ul segmentelor de dreapta este [algoritmul Cohen-Sutherland](http://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm "Cohen-Sutherland algorithm").
+
+Vom considera ca fereastra activa este definita de 4 valori reale: xmin, ymin, xmax, ymax. Un punct P(x,y) definit in coordonate utilizator este in interiorul ferestrei (deci vizibil) daca indeplineste relatiile :
+
+1.  xmin <= x <= xmax
+2.  ymin <= y <= ymax
+
+Aceste relatii trebuie in principiu verificate pentru fiecare punct al segmentului, ceea ce evident, este imposibil. Algoritmul de clipping **Cohen-Sutherland** porneste de la determinarea pozitiei relative a segmentului fata de fereastra. Exista 4 posibilitati: 
+
+1.  ambele capete ale segmentului sunt in interiorul ferestrei
+2.  un capat al segmentului este in interior iar celelalt in exterior
+3.  ambele capete ale segmentului sunt exterioare ferestrei, dar segmentul intersecteaza fereastra
+4.  ambele capete sunt in exteriorul ferestrei dar segmentul nu intersecteaza fereastra
+Planul utilizator este impartit in 9 regiuni carora li se asociaza cate un cod unic, format din 2 valori intregi (0 respectiv 1) conform figurii:
+
+![region codes](http://i39.tinypic.com/war5te.gif "CS Regional Segmentation")
+
+Descrierea algoritmului este urmatoarea:
+
+1.  Determina codurile de regiune pentru punctele P1, P2
+2.  Cele doua coduri sunt insumate logic (OR). Daca rezultatul este codul (0,0,0,0) segmentul este complet interior si este acceptat. EXIT. Altfel treci la pasul 3.
+3.  Cele doua coduri sunt inmultite logic (AND). Daca rezultatul este diferit de codul (0,0,0,0) segmentul este complet in afara ferestrei si este eliminat. EXIT. Altfel treci la pasul 4.
+4.  Se alege codul unui capat al segmentului. Daca acesta este codul (0,0,0,0) se alege celalalt cod.
+5.  Se inspecteaza codul in ordinea b3, b2, b1, b0 pentru a determina primul element b i = 1 care precizeaza frontiera ferestrei fata de care punctul este exterior.
+6.  Se calculeaza intersectia segmentului cu acea frontiera si se inlocuieste punctul cu intersectia determinata.
+7.  Se reia cu pasul 1.
+
+#### Cerinte ####
+
+1.   Adaugati la biblioteca grafica o functie (ex: ClipLine) ce va realiza decuparea segmentelor utilizand **algoritmul Cohen-Sutherland**
+2.   Modificati aplicatia realizata in laboratorul precedent adugand facilitati pentru decuparea segmentelor de dreapta. Programul va accepta din linia de comanda un nou set de parametri:
+  *  -wl window_left - corespunde xmin
+  *  -wt window_top - corespunde ymin
+  *  -wr window_right - corespunde xmax
+  *  -wb window_bottom - corespunde ymax
+
+
+Exemplu de utilizare: **lineout -f in.ps -w 200 -h 200 -wl 50 -wt 50 -wr 150 -wb 150 -o out.xpm**
+![conversion example](http://i41.tinypic.com/34q441i.gif)
