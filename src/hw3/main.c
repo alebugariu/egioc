@@ -101,6 +101,9 @@ main(int argc, char *argv[]){
     }
   }
 
+  if(optwRight == 0) optwRight = optWidth;
+  if(optwTop == 0)  optwTop = optHeight;
+
   img = newXPM(optWidth, optHeight, 1, sizeof(clrTable)/(sizeof(unsigned char) * 3));
   /*printf("%d l: %d r: %d, b: %d t: %d", isClipSet, optwLeft, optwRight, optwBottom, optwTop);*/
   if(0 != isClipSet) assignXPMdisplayRegion(img, optwLeft, optwTop, optwRight, optwBottom);
