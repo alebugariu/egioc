@@ -30,9 +30,9 @@ struct GENode{
   struct GENode *next;
 };
 
-/* Renders a GElement to a XPM canvas */
+/* Renders a 'GENode *' list to a XPM canvas */
 extern void
-renderGElement(XPM *canvas, GElement *el);
+renderGElements(XPM *canvas, struct GENode *glist);
 
 /* Extracts a GElement from a simple PS text line */
 extern procPSLineReturnVal

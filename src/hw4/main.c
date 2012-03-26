@@ -123,7 +123,7 @@ main(int argc, char *argv[]){
     applyTransforms(gTransforms, psList);
     freeTStrcuture(&gTransforms);
   }
-  
+  renderGElements(img, psList);
   saveXPMtofile(img, xpmOut);
   printf("Program finished ...\n");
 
