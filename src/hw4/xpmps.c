@@ -19,7 +19,7 @@ renderGElements(XPM *canvas, struct GENode *glist){
       }
       break;
     default:
-      fprintf(stderr, "Unhandled type!\n");
+      fprintf(stderr, "Unhandled type (%d) !\n", pge->type);
       break;
     }
     
@@ -56,16 +56,18 @@ loadPSFile(XPM *canvas, const char *file){
     /* process the file */
     fgets(currentLine, sizeof(currentLine), fhandle);
     while(!feof(fhandle) && strcmp(currentLine, PS_END_MARK) != 0){
-      newNode = (struct GENode *)malloc(sizeof(struct GENode));
-      parsePSLine(currentLine, &newNode->el);
-      
-      if(NULL == glist){
-	glist = plastNode = newNode;
-      } else {
-	newNode = plastNode->next;
-	plastNode = newNode;
+      if(strlen(currentLine) != 1){
+	newNode = (struct GENode *)malloc(sizeof(struct GENode));
+	newNode->next = NULL;
+	parsePSLine(currentLine, &newNode->el);
+	
+	if(NULL == glist){
+	  glist = plastNode = newNode;
+	} else {
+	  plastNode->next = newNode;
+	  plastNode = newNode;
+	}
       }
-      
       fgets(currentLine, sizeof(currentLine), fhandle);
     }
 
@@ -85,6 +87,4 @@ freePSFile(struct GENode **glist){
     free(pge);
     pge = nextpge;
   }
-
-  free(*glist);
 }
