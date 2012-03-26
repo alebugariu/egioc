@@ -5,6 +5,7 @@
 
 #include "xpmimage.h"
 #include "xpmps.h"
+#include "gtransforms.h"
 
 struct option{
   char *name;
@@ -118,8 +119,11 @@ main(int argc, char *argv[]){
   psList = loadPSFile(img, psInput);
   /* apply the desired graphical transformations on the XPM structure */
   if(NULL != transformFile){
-    
+    struct trans *gTransforms = loadTStructure(transformFile);
+    applyTransforms(gTransforms, psList);
+    freeTStrcuture(&gTransforms);
   }
+  
   saveXPMtofile(img, xpmOut);
   printf("Program finished ...\n");
 

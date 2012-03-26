@@ -1,7 +1,7 @@
 #ifndef _GTRANSFORMS_H_
 #define _GTRANSFORMS_H_
 
-#include "xpmimag.h"
+#include "xpmimage.h"
 #include "xpmps.h"
 
 enum TransformType{ TRANSLATION, SCALING, ROTATION };
@@ -28,6 +28,6 @@ extern void
 freeTStrcuture(struct trans **);
 
 extern void 
-applyTransforms(struct trans *, GElement *);
+applyTransforms(struct trans *, struct GENode *);
 
 #endif

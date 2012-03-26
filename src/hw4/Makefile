@@ -3,15 +3,13 @@ PRJNAME = lineout
 CC = gcc
 CFLAGS = -Wall -g
 LDFLAGS = -lm
+OBJS = xpmimage.o xpmps.o gtransforms.o
 
 #!!! you shouldn't modify anything beyond this point
-all: xpmimage.o xpmps.o
-	$(CC) $(CFLAGS) xpmimage.o xpmps.o main.c -o $(PRJNAME) $(LDFLAGS)
+all: $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) main.c -o $(PRJNAME) $(LDFLAGS)
 
-xpmimage.o: xpmimage.c xpmimage.h
-	$(CC) -c $(CFLAGS) -o $@ $< 
-
-xpmps.o : xpmps.c xpmps.h
+./%.o: ./%.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:

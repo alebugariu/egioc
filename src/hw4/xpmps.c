@@ -1,21 +1,29 @@
 #include "xpmps.h"
 
 void
-renderGElement(XPM *canvas, GElement *el){
-  switch(el->type){
-  case LINE:
-    printf("Original Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", el->data.line.st.x, el->data.line.st.y, el->data.line.en.x, el->data.line.en.y);
-    if(cohenSutherlandFrameLine(canvas, &el->data.line.st, &el->data.line.en) == 1){
-      printf("Trimed Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", el->data.line.st.x, el->data.line.st.y, el->data.line.en.x, el->data.line.en.y);
-      drawBresenhamLine(canvas, el->data.line.st, el->data.line.en, 1);
+renderGElements(XPM *canvas, struct GENode *glist){
+  struct GENode *pgl = glist;
+  GElement *pge = NULL;
+
+  while(NULL != pgl){
+    pge = &pgl->el;
+    switch(pge->type){
+    case LINE:
+      printf("Original Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", pge->data.line.st.x, pge->data.line.st.y, pge->data.line.en.x, pge->data.line.en.y);
+      if(cohenSutherlandFrameLine(canvas, &pge->data.line.st, &pge->data.line.en) == 1){
+	printf("Trimed Line := start{x:%4d y:%4d}, end{x:%4d y:%4d}\n", pge->data.line.st.x, pge->data.line.st.y, pge->data.line.en.x, pge->data.line.en.y);
+	drawBresenhamLine(canvas, pge->data.line.st, pge->data.line.en, 1);
+      }
+      else{
+	fprintf(stderr, "*** Line was totally outside the canvas.\n");
+      }
+      break;
+    default:
+      fprintf(stderr, "Unhandled type!\n");
+      break;
     }
-    else{
-      fprintf(stderr, "*** Line was totally outside the canvas.\n");
-    }
-    break;
-  default:
-    fprintf(stderr, "Unhandled type!\n");
-    break;
+    
+    pgl = pgl->next;
   }
 }
 
