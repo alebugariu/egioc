@@ -50,8 +50,6 @@ loadPSFile(XPM *canvas, const char *file){
     while(!feof(fhandle) && strcmp(currentLine, PS_END_MARK) != 0){
       newNode = (struct GENode *)malloc(sizeof(struct GENode));
       parsePSLine(currentLine, &newNode->el);
-      //if(NULL != applyTransformCallback) (*applyTransformCallback)(&aquiredEl);
-      //if(NULL != gCallback) (*gCallback)(canvas, &aquiredEl);
       
       if(NULL == glist){
 	glist = plastNode = newNode;
@@ -67,4 +65,18 @@ loadPSFile(XPM *canvas, const char *file){
   }
 
   return glist;
+}
+
+void
+freePSFile(struct GENode **glist){
+  struct GENode *pge = (*glist);
+  struct GENode *nextpge;
+
+  while(NULL != pge){
+    nextpge = pge->next;
+    free(pge);
+    pge = nextpge;
+  }
+
+  free(*glist);
 }

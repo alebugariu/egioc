@@ -38,8 +38,12 @@ renderGElement(XPM *canvas, GElement *el);
 extern procPSLineReturnVal
 parsePSLine(const char *line, GElement *dest);
 
-/* Loads and processes a simple PS file format through GElement structures */
+/* Loads and parses a list of 'struct GENode *' from a simple PS file */
 extern struct GENode *
 loadPSFile(XPM *canvas, const char *file);
+
+/* Frees the 'struct GENode *' list loaded by 'loadPSFile' function */
+extern void
+freePSFile(struct GENode **glist);
 
 #endif

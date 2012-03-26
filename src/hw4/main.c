@@ -124,5 +124,6 @@ main(int argc, char *argv[]){
   printf("Program finished ...\n");
 
   freeXPM(&img);
+  freePSFile(&psList);
   return 0;
 }
