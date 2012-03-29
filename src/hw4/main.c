@@ -24,6 +24,7 @@ printUsage(void){
 	 "-o <output_xpm>    : XPM desired output file\n"
 	 "ALL of the above options are mandatory!\n\n"
 	 "Beseides mandatory options, there are the optional ones:\n"
+	 "-t <transform_file>       : contains various transformations that are applied to the image\n"
 	 "-wl <window_left_margin>  : left margin clipping value\n"
 	 "-wr <window_right_margin> : right margin clipping value\n"
 	 "-wb <window_bottom_margin>: bottom margin clipping value\n"

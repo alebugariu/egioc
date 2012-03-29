@@ -26,6 +26,16 @@ struct trans{
   struct trans *next;
 };
 
+struct transMatrix
+{
+	double matrix[3][3];
+};
+
+struct homoCoord
+{
+	double coord[3];
+};
+
 extern struct trans *
 loadTStructure(char *);
 
@@ -34,5 +44,29 @@ freeTStrcuture(struct trans **);
 
 extern void 
 applyTransforms(struct trans *, struct GENode *);
+
+extern void 
+initTraslation(struct transMatrix *, int, int);
+
+extern void 
+initRotation(struct transMatrix *, int);
+
+extern void 
+initScale(struct transMatrix *, double , double);
+
+extern void 
+matrixProduct(struct transMatrix *, struct transMatrix, struct transMatrix);
+
+extern double 
+degToRad(int);
+
+extern void 
+matrixVectorProduct(struct homoCoord *, struct transMatrix, struct homoCoord);
+
+extern void 
+initHomoVector(struct homoCoord *, double , double);
+
+extern void 
+twoDCoord(GElement *, struct homoCoord, struct homoCoord);
 
 #endif
