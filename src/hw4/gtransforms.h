@@ -67,6 +67,6 @@ extern void
 initHomoVector(struct homoCoord *, double , double);
 
 extern void 
-twoDCoord(GElement *, struct homoCoord, struct homoCoord);
+twoDCoord(Point *, struct homoCoord);
 
 #endif
