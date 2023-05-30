@@ -1,7 +1,4 @@
-## About ##
-This repository contains some basic graphics tasks realized for the EGIOC (Graphical and Human Interface Programming) course at the Polytechnica University of Timisoara, Romania. 
-
-This file contains the homework assignments given by Prof. Sorin Babii (in Romanian).
+This repository contains some basic graphics tasks realized for the EGIOC (Graphical and Human Interface Programming) course at the Polytechnica University of Timisoara, Romania. In the following, we present the homework assignments given by Prof. Sorin Babii (in Romanian).
 
 ## Lucrarea 1: Formatul grafic XPM ##
 Tema acestui laborator presupune realizarea unei biblioteci ce va contine un set de functii necesare manipularii imaginilor in format XPM. Biblioteca implementata in cadrul acestei lucrari va fi refolosita in urmatorele lucrari.
